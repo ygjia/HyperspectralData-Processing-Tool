@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>678</width>
-    <height>485</height>
+    <width>685</width>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>高光谱数据分析软件</string>
   </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
@@ -35,8 +35,14 @@
     </property>
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="sizeIncrement">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -165,9 +171,6 @@
         <property name="spacing">
          <number>0</number>
         </property>
-        <item row="3" column="1">
-         <widget class="QGraphicsView" name="graphicsView_2"/>
-        </item>
         <item row="3" column="3">
          <widget class="QListWidget" name="listWidget"/>
         </item>
@@ -180,8 +183,14 @@
            </size>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
+           <property name="rightMargin">
+            <number>9</number>
+           </property>
            <property name="bottomMargin">
             <number>9</number>
+           </property>
+           <property name="horizontalSpacing">
+            <number>6</number>
            </property>
            <item row="0" column="13">
             <widget class="QPushButton" name="pushButton_4">
@@ -266,13 +275,6 @@
              </property>
             </spacer>
            </item>
-           <item row="2" column="15">
-            <widget class="QPushButton" name="pushButton_5">
-             <property name="text">
-              <string>手动生成数据</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="17">
             <widget class="QLabel" name="label_7">
              <property name="text">
@@ -356,22 +358,6 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="15">
-            <widget class="QPushButton" name="pushButton_2">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>83</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>一键生成数据</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="3">
             <widget class="QLineEdit" name="lineEdit">
              <property name="maximumSize">
@@ -409,7 +395,185 @@
              </property>
             </spacer>
            </item>
+           <item row="2" column="1">
+            <spacer name="horizontalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="15">
+            <widget class="QPushButton" name="pushButton_2">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>83</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>一键生成数据</string>
+             </property>
+             <property name="autoRepeatInterval">
+              <number>100</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="15">
+            <widget class="QPushButton" name="pushButton_5">
+             <property name="text">
+              <string>手动生成数据</string>
+             </property>
+            </widget>
+           </item>
           </layout>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QGraphicsView" name="graphicsView_2"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>数据平滑</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>9</number>
+        </property>
+        <item row="0" column="0" rowspan="15">
+         <widget class="QListView" name="listView_2"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="pushButton_15">
+          <property name="text">
+           <string>读取Excel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QPushButton" name="pushButton_16">
+          <property name="text">
+           <string>Moing平滑</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="13" column="1">
+         <widget class="QPushButton" name="pushButton_14">
+          <property name="text">
+           <string>SG平滑</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="8" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="6" column="1">
+         <widget class="QComboBox" name="comboBox_6"/>
+        </item>
+        <item row="14" column="1">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="10" column="1">
+         <widget class="QComboBox" name="comboBox_5"/>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="pushButton_10">
+          <property name="text">
+           <string>读取CSV</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="pushButton_11">
+          <property name="text">
+           <string>读取Mat</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>窗口大小</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="1">
+         <widget class="QComboBox" name="comboBox_4"/>
+        </item>
+        <item row="11" column="1">
+         <widget class="QLabel" name="label_20">
+          <property name="text">
+           <string>多项式幂数</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLabel" name="label_21">
+          <property name="text">
+           <string>窗口大小</string>
+          </property>
          </widget>
         </item>
        </layout>
@@ -418,7 +582,220 @@
        <attribute name="title">
         <string>判別模型构建</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout"/>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>9</number>
+        </property>
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <item row="0" column="6" colspan="8">
+         <widget class="QTextEdit" name="textEdit">
+          <property name="html">
+           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="12">
+         <widget class="QPushButton" name="pushButton_17">
+          <property name="text">
+           <string>生成混淆矩阵</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="10">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>KFold</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="11">
+         <widget class="QLineEdit" name="lineEdit_4"/>
+        </item>
+        <item row="2" column="11">
+         <widget class="QLineEdit" name="lineEdit_5"/>
+        </item>
+        <item row="2" column="10">
+         <widget class="QLabel" name="label_18">
+          <property name="text">
+           <string>子空间维度</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="8">
+         <widget class="QLineEdit" name="lineEdit_6"/>
+        </item>
+        <item row="4" column="8">
+         <widget class="QLineEdit" name="lineEdit_3"/>
+        </item>
+        <item row="4" column="7">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>迭代次数</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="13">
+         <spacer name="horizontalSpacer_9">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="5">
+         <spacer name="horizontalSpacer_10">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="6">
+         <spacer name="horizontalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="3">
+         <spacer name="horizontalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="9">
+         <spacer name="horizontalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="4">
+         <widget class="QPushButton" name="pushButton_7">
+          <property name="text">
+           <string>清空列表</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3" colspan="3">
+         <widget class="QListWidget" name="listWidget_2">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="dragEnabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
+         <widget class="QPushButton" name="pushButton_6">
+          <property name="text">
+           <string>读取数据文件夹</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="12">
+         <widget class="QPushButton" name="pushButton_18">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="sizeIncrement">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>分类</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="7">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>弱分类器个数</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="3">
+         <spacer name="horizontalSpacer_13">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -429,7 +806,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>678</width>
+     <width>685</width>
      <height>23</height>
     </rect>
    </property>
@@ -437,8 +814,6 @@
     <property name="title">
      <string>菜单</string>
     </property>
-    <addaction name="action"/>
-    <addaction name="action_2"/>
     <addaction name="separator"/>
     <addaction name="action_4"/>
    </widget>
@@ -461,6 +836,19 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>comboBox_2</tabstop>
+  <tabstop>comboBox_3</tabstop>
+  <tabstop>pushButton_4</tabstop>
+  <tabstop>pushButton_3</tabstop>
+  <tabstop>listWidget</tabstop>
+  <tabstop>graphicsView_2</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>graphicsView</tabstop>
+  <tabstop>pushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -470,92 +858,12 @@
    <slot>OnClickedTab1Button()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>600</x>
-     <y>440</y>
+     <x>575</x>
+     <y>441</y>
     </hint>
     <hint type="destinationlabel">
      <x>566</x>
-     <y>-5</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBox</sender>
-   <signal>currentIndexChanged(QString)</signal>
-   <receiver>Hyperspectral</receiver>
-   <slot>ShowBond()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>600</x>
-     <y>292</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>597</x>
-     <y>-6</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_4</sender>
-   <signal>clicked()</signal>
-   <receiver>Hyperspectral</receiver>
-   <slot>OnCilickedTab2Butto1()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>413</x>
-     <y>389</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>466</x>
-     <y>-14</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_3</sender>
-   <signal>clicked()</signal>
-   <receiver>Hyperspectral</receiver>
-   <slot>OnCilickedTab2Butto2()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>452</x>
-     <y>422</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>614</x>
-     <y>-17</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_2</sender>
-   <signal>clicked()</signal>
-   <receiver>Hyperspectral</receiver>
-   <slot>OnCilickedTab2Butto3()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>601</x>
-     <y>387</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>390</x>
-     <y>-13</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_5</sender>
-   <signal>clicked()</signal>
-   <receiver>Hyperspectral</receiver>
-   <slot>OnCilickedTab2Butto4()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>545</x>
-     <y>432</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>542</x>
-     <y>-1</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -571,7 +879,39 @@
     </hint>
     <hint type="destinationlabel">
      <x>328</x>
-     <y>-3</y>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>ShowBond()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>293</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>OnCilickedTab2Butto1()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>433</x>
+     <y>389</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -582,12 +922,172 @@
    <slot>OnChangedTab2ComboBox1()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>299</x>
-     <y>382</y>
+     <x>334</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
-     <x>631</x>
+     <x>602</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>OnCilickedTab2Butto2()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>445</x>
+     <y>443</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>602</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>OnCilickedTab2Butto3()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>549</x>
+     <y>403</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>390</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_5</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>OnCilickedTab2Butto4()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>545</x>
+     <y>432</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>542</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_6</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>ReadDirTab4()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>149</x>
+     <y>422</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>16</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_7</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>ClearListTab4()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>151</x>
+     <y>454</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>39</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_18</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>ShowResultsTab4()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>592</x>
+     <y>419</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>123</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_17</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>MatrixTab4()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>627</x>
+     <y>438</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>141</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_11</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>ReadMatTab2()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>646</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>113</x>
+     <y>-12</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_16</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>MovingFliter()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>633</x>
+     <y>261</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>143</x>
      <y>-6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_14</sender>
+   <signal>clicked()</signal>
+   <receiver>Hyperspectral</receiver>
+   <slot>SGFliter()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>643</x>
+     <y>419</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>163</x>
+     <y>-18</y>
     </hint>
    </hints>
   </connection>
@@ -601,5 +1101,12 @@
   <slot>OnCilickedTab2Butto4()</slot>
   <slot>OnChangedTab2listWidget()</slot>
   <slot>OnChangedTab2ComboBox1()</slot>
+  <slot>ReadDirTab4()</slot>
+  <slot>ClearListTab4()</slot>
+  <slot>ShowResultsTab4()</slot>
+  <slot>MatrixTab4()</slot>
+  <slot>ReadMatTab2()</slot>
+  <slot>MovingFliter()</slot>
+  <slot>SGFliter()</slot>
  </slots>
 </ui>

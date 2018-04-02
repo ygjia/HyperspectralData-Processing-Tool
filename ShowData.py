@@ -8,12 +8,7 @@ def showData(fileName):
     fd = open(fileName, 'rb')
 
     hdrFileName = fileName[:-4]+".hdr"
-    print(hdrFileName)
     w,x,y,z,dt = readInfo(hdrFileName)
-    # '''图片的维数'''
-    # x = 250
-    # y = 320
-    # z = 256
 
     if(dt == 2):
         f = np.fromfile(fd, dtype=np.int16, count=x * y * z)
@@ -22,6 +17,7 @@ def showData(fileName):
         temp = np.max(im)-np.min(im)
         fd.close()
         gray = np.uint8(im[:, 197, :]*255/temp)
+
     if(dt == 4):
         f = np.fromfile(fd, dtype=np.float32, count=x * y * z)
         '''按照BIL格式文件来reshape'''
@@ -35,30 +31,9 @@ def showData(fileName):
     circles = circle[0, :, :];
     circles = np.uint16(np.around(circles))
 
-    # plt.figure("Hough变换识别ROI区域")
-    # for i in circles[:]:
-    #     cv2.circle(gray, (i[0], i[1]), i[2], (255, 0, 0), 2)
-    #     cv2.circle(gray, (i[0], i[1]), 2, (255, 0, 0), 4)
-    #
-    # plt.xticks([])
-    # plt.yticks([])
-    # plt.savefig('file.png', bbox_inches='tight', pad_inches=0)
-    #
-    # spectrum = [im[circles[i][1], :, circles[i][0]] for i in np.arange(circles.shape[0])]
-    #
-    # plt.figure("圆心处对应的光谱曲线")
-    # for i in np.arange(circles.shape[0]):
-    #     plt.subplot(2, 3, i + 1);
-    #     plt.title(circles[i])
-    #     plt.plot(spectrum[i])
-
-#    plt.show()
-
     return im
 
 def readInfo(fileName):
-    #fileName = 'Data/HSI23_refl0.raw.hdr'
-    #flleName1 = 'Data/FLFemale_01.bil.hdr'
 
     hdrFile = open(fileName)
     text = hdrFile.read()
@@ -78,4 +53,3 @@ def readInfo(fileName):
 
     return waveList , int(x) , int(y) , int(z),int(dataType)
 
-# a,b,c,d = readInfo('Data/HSI23_refl0.raw.hdr')
