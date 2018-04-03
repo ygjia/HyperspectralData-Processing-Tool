@@ -2,7 +2,7 @@
 
 正在完善中...
 
-![main](img/Window.png)
+![main](/img/Window.png)
 
 
 
