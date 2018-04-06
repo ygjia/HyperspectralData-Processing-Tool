@@ -1,6 +1,7 @@
 from MainWindow import *
 from ShowData import *
 import scipy.io as sio
+from scipy.signal import savgol_filter
 import Classifier
 
 import sys
@@ -203,18 +204,21 @@ class MenuLabel(QLabel):
 class MyWindow(QMainWindow,Ui_Hyperspectral):
     def __init__(self,parent = None):
         super(MyWindow,self).__init__(parent)
-
         self.setupUi(self)
+
+        self.action_4.triggered.connect(self.about)
         ''' Tab2 Init '''
-        self.lineEdit.clear()
-        self.lineEdit_2.clear()
-        self.lineEdit_3.clear()
-        self.lineEdit_4.clear()
-        self.lineEdit_5.clear()
-        self.lineEdit_6.clear()
-        list = ['1','2','3','4','5','6','7','8','9','10']
-        self.comboBox_6.addItems(list)
-        self.comboBox_5.addItems(list)
+        self.lineEdit.setText("10")
+        self.lineEdit_2.setText("70")
+        self.lineEdit_3.setText("5")
+        self.lineEdit_4.setText("5")
+        self.lineEdit_5.setText("128")
+        self.lineEdit_6.setText("30")
+        list = ['1','2','3','4','5','6']
+        for i in range(1,31,1):
+            if(i%2):
+                self.comboBox_6.addItems([str(i)])
+                self.comboBox_5.addItems([str(i)])
         self.comboBox_4.addItems(list)
 
         self.comboBox_3.addItems(["圆形"])
@@ -346,7 +350,6 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
     def OnCilickedTab2Butto2(self):
         pass
 
-
     def OnCilickedTab2Butto3(self):
         if(not hasattr(self,'w')):
             return
@@ -404,7 +407,6 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
                 fileName = 'Circle_'+fileName + '.xls'
                 excelFile.save(fileName)
 
-
     def OnCilickedTab2Butto4(self):
         pass
 
@@ -453,29 +455,30 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
             if (self.lineEdit_3.text().__len__() is 0):
                 iterNum = 5
             else:
-                numLearn = int(self.lineEdit_3.text())
+                iterNum = int(self.lineEdit_3.text())
 
 
             self.textEdit.clear()
             accLDA,self.matLDA = Classifier.LDA(fileURL,iterNum,kflod)
-            text = "LDA," + str(kflod) +"折交叉验证,迭代" +str(iterNum)+"次,准确率为:" + str(accLDA)
+
+            text = 'LDA,{0}折交叉验证,迭代{1}次,准确率为:{2}'.format(kflod,iterNum,accLDA)
             self.textEdit.append(text)
 
             accSVM,self.matSVM = Classifier.SVM(fileURL,iterNum,kflod)
-            text = "SVM," + str(kflod) + "折交叉验证,迭代" + str(iterNum) + "次,准确率为:" + str(accSVM)
+            text = 'SVM,{0}折交叉验证,迭代{1}次,准确率为:{2}'.format(kflod, iterNum, accSVM)
             self.textEdit.append(text)
 
             accKNN,self.matKNN = Classifier.KNN(fileURL,iterNum,kflod)
-            text = "KNN," + str(kflod) + "折交叉验证,迭代" + str(iterNum) + "次,准确率为:" + str(accKNN)
+            text = 'KNN,{0}折交叉验证,迭代{1}次,准确率为:{2}'.format(kflod, iterNum, accKNN)
             self.textEdit.append(text)
 
             accDT,self.matDT = Classifier.DT(fileURL,iterNum,kflod)
-            text = "DecisionTree," + str(kflod) + "折交叉验证,迭代" + str(iterNum) + "次,准确率为:" + str(accDT)
+            text = 'DecisionTree,{0}折交叉验证,迭代{1}次,准确率为:{2}'.format(kflod, iterNum, accDT)
             self.textEdit.append(text)
 
-            # accSDE,self.matSDE = Classifier.SDE(fileURL,kflod,numLearn,numWave)
-            # text = "SDE," + str(kflod) + "折交叉验证," + str(numLearn) + "个弱学习器,子空间维数为"+str(numWave)+"时,准确率为:" + str(accSDE)
-            # self.textEdit.append(text)
+            accSDE,self.matSDE = Classifier.SDE(fileURL,kflod,numLearn,numWave)
+            text = 'SDE,{0}折交叉验证,{1}个弱学习器,子空间维数为{2}时,准确率为:{3}'.format(kflod, numLearn,numWave,accSDE)
+            self.textEdit.append(text)
 
         if(os.path.splitext(fileName)[1] == ".xls"):
             pass
@@ -499,29 +502,81 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         for i in self.matDT:
             self.textEdit.append(str(i))
         self.textEdit.append("confusion_matrix:SDE")
-        # for i in self.matSDE:
-        #     self.textEdit.append(str(i))
+        for i in self.matSDE:
+            self.textEdit.append(str(i))
 
     def ReadMatTab2(self):
         self.Tab4DirPath = QFileDialog.getExistingDirectory()
         if (not self.Tab4DirPath):
             return
         matFiles = [i for i in os.listdir(self.Tab4DirPath) if os.path.splitext(i)[1] == ".mat"]
+
         if(not matFiles):
             return
-        variableName = "afterSGSmooth"
-        mat = sio.loadmat(matFiles)
-        data = mat[variableName]
-        newData = data[:256, :].T
-        label = data[256, :].T
-
+        else:
+            self.listWidget_3.addItems(matFiles)
 
     def MovingFliter(self):
-        pass
+        fileName = self.listWidget_3.currentItem().text()
+        num = int(self.comboBox_6.currentText())
+
+        if(fileName):
+            variableName = "afterSGSmooth"
+            matUrl = os.path.join(self.Tab4DirPath,fileName)
+            mat = sio.loadmat(matUrl)
+            data = mat[variableName]
+            newData = data[:256, :].T
+            moving  = pd.rolling_mean(newData,num)
+            plt.figure("Moving")
+            plt.subplot(121)
+            for i in newData:
+                plt.plot(i)
+            plt.title("BeforeSmooth")
+
+            plt.subplot(122)
+            for i in moving:
+                plt.plot(i)
+            plt.title("AfterSmooth")
+            plt.show()
+            newMatName = fileName[:-4]+"_AfterMovingSmooth.mat"
+            sio.savemat(os.path.join(self.Tab4DirPath,newMatName),{"Data": moving})
+            self.listWidget_4.addItems([newMatName])
 
     def SGFliter(self):
-        pass
+        fileName = self.listWidget_3.currentItem().text()
+        num = int(self.comboBox_5.currentText())
+        poly = int(self.comboBox_4.currentText())
+        if (fileName):
+            variableName = "Data"
+            matUrl = os.path.join(self.Tab4DirPath, fileName)
+            mat = sio.loadmat(matUrl)
+            data = mat[variableName]
+            newData = data[:256, :].T
 
+            plt.figure("Savitzky-Golay")
+            plt.subplot(121)
+            for i in newData:
+                plt.plot(i)
+            plt.title("BeforeSmooth")
+
+            plt.subplot(122)
+            sg = savgol_filter(newData,num,poly)
+            for i in sg:
+                plt.plot(i)
+            plt.title("AfterSmooth")
+            plt.show()
+            newMatName = fileName[:-4] + "_AfterSGSmooth.mat"
+            sio.savemat(os.path.join(self.Tab4DirPath, newMatName), {"Data": sg})
+            self.listWidget_4.addItems([newMatName])
+    def about(self):
+        msg_box = QMessageBox(QMessageBox.Information,"关于本软件",
+                              "<p align='center'>陕西省大学生科技创新项目</p>"
+                              "<p align='center'>基于高光谱图像的苹果表面农残检测研究成果</p>"
+                              "<p align='right'> 西北农林科技大学信息工程学院</p>"
+                              "<p align='right'> 贾亚光,邵夏天</p>"
+
+                              )
+        msg_box.exec_()
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     Window = MyWindow()
