@@ -10,7 +10,8 @@ import pandas as pd
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt,QRectF,QPointF,QPoint
+
 import xlwt
 import matplotlib.pyplot as plt
 import numpy as np
@@ -200,6 +201,29 @@ class MenuLabel(QLabel):
     def showContextMenu(self):
         self.contextMenu.exec_(QCursor.pos())
 
+class MyGraphicsScene(QGraphicsScene):
+
+    def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent'):
+        self.pressPos = event.scenePos()
+
+    def mouseMoveEvent(self, event: 'QGraphicsSceneMouseEvent'):
+        self.movePos = event.scenePos()
+
+        pen = QPen()
+        pen.setColor(QColor(255, 0, 0))
+        bru = QBrush()
+        self.addLine(self.pressPos.x(),self.pressPos.y(),self.movePos.x(),self.pressPos.y(), pen)
+        self.addLine(self.pressPos.x(),self.pressPos.y(),self.pressPos.x(),self.movePos.y(), pen)
+
+
+
+    def mouseReleaseEvent(self, event: 'QGraphicsSceneMouseEvent'):
+        self.relessPos= event.scenePos()
+        rec = QRectF(QPointF(self.pressPos), self.relessPos)
+        pen = QPen()
+        pen.setColor(QColor(255, 0, 0))
+        bru = QBrush()
+        self.addRect(rec, pen, bru)
 
 class MyWindow(QMainWindow,Ui_Hyperspectral):
     def __init__(self,parent = None):
@@ -275,9 +299,8 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         bytesPerLine = bytesPerComponent * width
         Qimg = QImage(img2D, width, height, bytesPerLine, QImage.Format_Grayscale8)
 
-        scene = QGraphicsScene()
+        scene = MyGraphicsScene()
         scene.addPixmap(QPixmap(Qimg))
-
         return scene
 
     def ShowBond(self):
@@ -346,9 +369,11 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         scene = self.ConventToQImageWithHough(band)
         self.graphicsView_2.setScene(scene)
 
-
     def OnCilickedTab2Butto2(self):
-        pass
+        pen = QPen()
+        pen.setColor(QColor(255, 0, 0))
+        self.graphicsView_2.scene().addRect(0, 0, 200, 200, pen, QBrush())
+
 
     def OnCilickedTab2Butto3(self):
         if(not hasattr(self,'w')):
@@ -568,6 +593,7 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
             newMatName = fileName[:-4] + "_AfterSGSmooth.mat"
             sio.savemat(os.path.join(self.Tab4DirPath, newMatName), {"Data": sg})
             self.listWidget_4.addItems([newMatName])
+
     def about(self):
         msg_box = QMessageBox(QMessageBox.Information,"关于本软件",
                               "<p align='center'>陕西省大学生科技创新项目</p>"
@@ -577,6 +603,7 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
 
                               )
         msg_box.exec_()
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     Window = MyWindow()
