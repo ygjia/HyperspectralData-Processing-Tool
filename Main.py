@@ -17,11 +17,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def showSpectrumInCurrentFigure():
+ROIByManualLeftUp = []
+ROIByManualRightDown = []
 
-    p1 = QCursor.pos()
-    p2 = Window.lab.mapToGlobal(Window.lab.pos())
-    p = p1 - p2
+def showSpectrumInCurrentFigure():
+    p = Window.lab.point
 
     gw = Window.graphicsView.width()
     gh = Window.graphicsView.height()
@@ -49,7 +49,6 @@ def showSpectrumInCurrentFigure():
         plt.axvline(float(Window.w[Window.comboBox.currentIndex()]))
         plt.plot(Window.w[Window.comboBox.currentIndex()],
                  Window.image[y, :, x][Window.comboBox.currentIndex()],'o')
-        #plt.legend(["Spectral curve","Current spectral band"])
         plt.show()
 
     else:
@@ -57,9 +56,7 @@ def showSpectrumInCurrentFigure():
         msg_box.exec_()
 
 def showSpectrum():
-    p1 = QCursor.pos()
-    p2 = Window.lab.mapToGlobal(Window.lab.pos())
-    p = p1 - p2
+    p = Window.lab.point
 
     gw = Window.graphicsView.width()
     gh = Window.graphicsView.height()
@@ -179,14 +176,13 @@ class MenuLabel(QLabel):
     def __init__(self, parent=None):
         super(MenuLabel, self).__init__(parent)
         self.createContextMenu()
-
+        self.point = None
+    def mousePressEvent(self, ev: QtGui.QMouseEvent):
+        self.point = ev.pos()
     def createContextMenu(self):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.showContextMenu)
-
         self.contextMenu = QMenu(self)
-
-
         self.action = self.contextMenu.addAction(QIcon('img/line.png'),u'显示光谱曲线')
         self.action.triggered.connect(showSpectrum)
         self.action1 = self.contextMenu.addAction(QIcon('img/line.png'), u'在现有图中显示光谱曲线')
@@ -198,24 +194,20 @@ class MenuLabel(QLabel):
         self.action4 = self.contextMenu.addAction(QIcon('img/CSV.png'), u'保存该点光谱至CSV')
         self.action4.triggered.connect(saveSpectrumToCSV)
 
+
     def showContextMenu(self):
         self.contextMenu.exec_(QCursor.pos())
 
 class MyGraphicsScene(QGraphicsScene):
-
     def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent'):
         self.pressPos = event.scenePos()
 
     def mouseMoveEvent(self, event: 'QGraphicsSceneMouseEvent'):
         self.movePos = event.scenePos()
-
         pen = QPen()
         pen.setColor(QColor(255, 0, 0))
-        bru = QBrush()
         self.addLine(self.pressPos.x(),self.pressPos.y(),self.movePos.x(),self.pressPos.y(), pen)
         self.addLine(self.pressPos.x(),self.pressPos.y(),self.pressPos.x(),self.movePos.y(), pen)
-
-
 
     def mouseReleaseEvent(self, event: 'QGraphicsSceneMouseEvent'):
         self.relessPos= event.scenePos()
@@ -224,14 +216,20 @@ class MyGraphicsScene(QGraphicsScene):
         pen.setColor(QColor(255, 0, 0))
         bru = QBrush()
         self.addRect(rec, pen, bru)
+        ROIByManualLeftUp.append(self.pressPos)
+        ROIByManualRightDown.append(self.relessPos)
 
 class MyWindow(QMainWindow,Ui_Hyperspectral):
     def __init__(self,parent = None):
         super(MyWindow,self).__init__(parent)
         self.setupUi(self)
-
         self.action_4.triggered.connect(self.about)
+
         ''' Tab2 Init '''
+        self.scene = MyGraphicsScene()
+
+
+
         self.lineEdit.setText("10")
         self.lineEdit_2.setText("70")
         self.lineEdit_3.setText("5")
@@ -299,9 +297,9 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         bytesPerLine = bytesPerComponent * width
         Qimg = QImage(img2D, width, height, bytesPerLine, QImage.Format_Grayscale8)
 
-        scene = MyGraphicsScene()
-        scene.addPixmap(QPixmap(Qimg))
-        return scene
+
+        self.scene.addPixmap(QPixmap(Qimg))
+        return self.scene
 
     def ShowBond(self):
         band = self.comboBox.currentIndex()
@@ -370,10 +368,8 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         self.graphicsView_2.setScene(scene)
 
     def OnCilickedTab2Butto2(self):
-        pen = QPen()
-        pen.setColor(QColor(255, 0, 0))
-        self.graphicsView_2.scene().addRect(0, 0, 200, 200, pen, QBrush())
-
+        print(ROIByManualLeftUp)
+        print(ROIByManualRightDown)
 
     def OnCilickedTab2Butto3(self):
         if(not hasattr(self,'w')):
@@ -433,7 +429,64 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
                 excelFile.save(fileName)
 
     def OnCilickedTab2Butto4(self):
-        pass
+        if (not hasattr(self, 'w')):
+            return
+
+        band = self.w.index(self.comboBox_2.currentText())
+        temp = np.max(self.image) - np.min(self.image)
+        img2D = np.uint8((self.image[:, band, :] / temp) * 255)
+
+        if (self.comboBox_3.currentText() == "矩形"):
+                excelFile = xlwt.Workbook(encoding='utf-8')
+                booksheet = excelFile.add_sheet('Spectrum', cell_overwrite_ok=True)
+                Len = len(ROIByManualLeftUp)
+                for i in np.arange(0,Len,1):
+                    sx = int(ROIByManualLeftUp[i].x())
+                    sy = int(ROIByManualLeftUp[i].y())
+                    ex = int(ROIByManualRightDown[i].x())
+                    ey = int(ROIByManualRightDown[i].y())
+
+                    data = self.image[sy:ey,:,sx:ex]
+                    data = np.average(data, axis=0)
+                    data = np.average(data, axis=1)
+                    plt.plot(data)
+
+                    for k, j in enumerate(data):
+                        booksheet.write(k, i, str(j))
+                fileName = self.listWidget.currentItem().text()
+                fileName = 'Rectangle_' + fileName + '.xls'
+                excelFile.save(fileName)
+                plt.show()
+        else:
+
+                excelFile = xlwt.Workbook(encoding='utf-8')
+                booksheet = excelFile.add_sheet('Spectrum', cell_overwrite_ok=True)
+                Len = len(ROIByManualLeftUp)
+                for i in np.arange(0, Len, 1):
+                    sx = int(ROIByManualLeftUp[i].x())
+                    sy = int(ROIByManualLeftUp[i].y())
+                    ex = int(ROIByManualRightDown[i].x())
+                    ey = int(ROIByManualRightDown[i].y())
+                    m=min(ex-sx,ey-sy)
+                    cx = int((sx+ex)/2)
+                    cy = int((sy+ey)/2)
+                    data = self.image[cy, :,cx]
+                    for i in np.arange(-1 * m, m, 1):
+                        for j in np.arange(-1 * m, m, 1):
+                            if (i ** 2 + j ** 2 < m ** 2 and i ** 2 + j ** 2 != 0):
+                                data = np.c_[data, self.image[cy + i, :, cx + j]]
+                    data = np.average(data, axis=1)
+                    plt.plot(data)
+                    for k, j in enumerate(data):
+                        booksheet.write(k, i, str(j))
+
+                fileName = self.listWidget.currentItem().text()
+                fileName = 'Circle_' + fileName + '.xls'
+                excelFile.save(fileName)
+
+                plt.show()
+        ROIByManualLeftUp.clear()
+        ROIByManualRightDown.clear()
 
     def ReadDirTab4(self):
         self.Tab4DirPath = QFileDialog.getExistingDirectory()
@@ -536,11 +589,10 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
             return
         matFiles = [i for i in os.listdir(self.Tab4DirPath) if os.path.splitext(i)[1] == ".mat"]
 
-        if(not matFiles):
+        if (not matFiles):
             return
         else:
             self.listWidget_3.addItems(matFiles)
-
     def MovingFliter(self):
         fileName = self.listWidget_3.currentItem().text()
         num = int(self.comboBox_6.currentText())
@@ -603,6 +655,7 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
 
                               )
         msg_box.exec_()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
