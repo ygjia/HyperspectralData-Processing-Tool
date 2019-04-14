@@ -1,6 +1,6 @@
-# 一个高光谱数据分析软件
+# A simple software for processing hyperspectral data
 
-正在完善中...
+Although not perfect, it may not be updated.
 
 ![main](/img/Window.png)
 
