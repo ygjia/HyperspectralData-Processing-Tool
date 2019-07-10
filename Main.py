@@ -8,9 +8,9 @@ import sys
 import os,re
 import pandas as pd
 
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt,QRectF,QPointF,QPoint
+from PyQt5.QtGui import QImage,QCursor,QIcon,QPixmap,QColor,QPen,QBrush
+from PyQt5.QtWidgets import QMenu,QLabel,QGraphicsScene,QMainWindow,QApplication,QMessageBox,QFileDialog,QVBoxLayout
+from PyQt5.QtCore import Qt,QRectF,QPointF
 
 import xlwt
 import matplotlib.pyplot as plt
