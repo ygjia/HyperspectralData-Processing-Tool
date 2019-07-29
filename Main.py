@@ -11,6 +11,7 @@ import pandas as pd
 from PyQt5.QtGui import QImage,QCursor,QIcon,QPixmap,QColor,QPen,QBrush
 from PyQt5.QtWidgets import QMenu,QLabel,QGraphicsScene,QMainWindow,QApplication,QMessageBox,QFileDialog,QVBoxLayout
 from PyQt5.QtCore import Qt,QRectF,QPointF
+from PyQt5.QtWidgets import *
 
 import xlwt
 import matplotlib.pyplot as plt
@@ -19,6 +20,10 @@ import numpy as np
 
 ROIByManualLeftUp = []
 ROIByManualRightDown = []
+
+
+#!!垃圾代码!!
+
 
 def showSpectrumInCurrentFigure():
     p = Window.lab.point
@@ -198,26 +203,45 @@ class MenuLabel(QLabel):
     def showContextMenu(self):
         self.contextMenu.exec_(QCursor.pos())
 
+
+# this is Tab2
 class MyGraphicsScene(QGraphicsScene):
-    def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent'):
+    def mousePressEvent(self, event):
         self.pressPos = event.scenePos()
 
-    def mouseMoveEvent(self, event: 'QGraphicsSceneMouseEvent'):
-        self.movePos = event.scenePos()
-        pen = QPen()
-        pen.setColor(QColor(255, 0, 0))
-        self.addLine(self.pressPos.x(),self.pressPos.y(),self.movePos.x(),self.pressPos.y(), pen)
-        self.addLine(self.pressPos.x(),self.pressPos.y(),self.pressPos.x(),self.movePos.y(), pen)
+        self.Rec = QRectF(self.pressPos,self.pressPos)
+        #
+        self.RecItem = QGraphicsRectItem(self.Rec)
+        self.RecItem.setVisible(True)
+        self.addItem(self.RecItem)
+        # self.addRect(self.Rec)
+    def mouseMoveEvent(self, event):
 
-    def mouseReleaseEvent(self, event: 'QGraphicsSceneMouseEvent'):
-        self.relessPos= event.scenePos()
-        rec = QRectF(QPointF(self.pressPos), self.relessPos)
-        pen = QPen()
-        pen.setColor(QColor(255, 0, 0))
-        bru = QBrush()
-        self.addRect(rec, pen, bru)
-        ROIByManualLeftUp.append(self.pressPos)
-        ROIByManualRightDown.append(self.relessPos)
+        self.movePos = event.scenePos()
+        # self.removeItem(self.Rec)
+
+        # self.Rec.setBottomRight(self.movePos)
+
+        self.removeItem(self.RecItem)
+        self.RecItem.setRect(QRectF(self.pressPos,self.movePos))
+
+        self.addItem(self.RecItem)
+
+
+
+    def mouseReleaseEvent(self, event):
+
+        pass
+        # self.relessPos= event.scenePos()
+        # rec = QRectF(QPointF(self.pressPos), self.relessPos)
+        # pen = QPen()
+        # pen.setColor(QColor(255, 0, 0))
+        # bru = QBrush()
+        # self.addRect(rec, pen, bru)
+        # ROIByManualLeftUp.append(self.pressPos)
+        # ROIByManualRightDown.append(self.relessPos)
+
+
 
 class MyWindow(QMainWindow,Ui_Hyperspectral):
     def __init__(self,parent = None):

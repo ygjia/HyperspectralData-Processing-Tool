@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Hyperspectral(object):
     def setupUi(self, Hyperspectral):
         Hyperspectral.setObjectName("Hyperspectral")
-        Hyperspectral.resize(668, 486)
+        Hyperspectral.resize(700, 515)
         Hyperspectral.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.centralwidget = QtWidgets.QWidget(Hyperspectral)
         self.centralwidget.setObjectName("centralwidget")
@@ -35,7 +35,6 @@ class Ui_Hyperspectral(object):
         self.widget.setMinimumSize(QtCore.QSize(200, 0))
         self.widget.setObjectName("widget")
         self.gridLayout = QtWidgets.QGridLayout(self.widget)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
         self.pushButton = QtWidgets.QPushButton(self.widget)
         self.pushButton.setMinimumSize(QtCore.QSize(0, 50))
@@ -82,7 +81,7 @@ class Ui_Hyperspectral(object):
         self.widget_2.setMinimumSize(QtCore.QSize(100, 100))
         self.widget_2.setObjectName("widget_2")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.widget_2)
-        self.gridLayout_3.setContentsMargins(0, 0, 9, 9)
+        self.gridLayout_3.setContentsMargins(-1, -1, 9, 9)
         self.gridLayout_3.setHorizontalSpacing(6)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.pushButton_4 = QtWidgets.QPushButton(self.widget_2)
@@ -175,7 +174,6 @@ class Ui_Hyperspectral(object):
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.tab_3)
-        self.gridLayout_5.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_5.setObjectName("gridLayout_5")
         self.listWidget_3 = QtWidgets.QListWidget(self.tab_3)
         self.listWidget_3.setObjectName("listWidget_3")
@@ -300,7 +298,7 @@ class Ui_Hyperspectral(object):
         self.horizontalLayout.addWidget(self.tabWidget)
         Hyperspectral.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Hyperspectral)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 668, 23))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 700, 23))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -319,7 +317,7 @@ class Ui_Hyperspectral(object):
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(Hyperspectral)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         self.pushButton.clicked.connect(Hyperspectral.OnClickedTab1Button)
         self.listWidget.currentRowChanged['int'].connect(Hyperspectral.OnChangedTab2listWidget)
         self.comboBox.currentIndexChanged['QString'].connect(Hyperspectral.ShowBond)
