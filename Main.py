@@ -21,10 +21,6 @@ import numpy as np
 ROIByManualLeftUp = []
 ROIByManualRightDown = []
 
-
-#!!垃圾代码!!
-
-
 def showSpectrumInCurrentFigure():
     p = Window.lab.point
 
