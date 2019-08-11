@@ -1,243 +1,24 @@
-from MainWindow import *
-from ShowData import *
+from src.ui.MainWindow import *
+from src.ShowData import *
 import scipy.io as sio
 from scipy.signal import savgol_filter
-import Classifier
+from src import Classifier
 
 import sys
 import os,re
 import pandas as pd
 
-from PyQt5.QtGui import QImage,QCursor,QIcon,QPixmap,QColor,QPen,QBrush
-from PyQt5.QtWidgets import QMenu,QLabel,QGraphicsScene,QMainWindow,QApplication,QMessageBox,QFileDialog,QVBoxLayout
-from PyQt5.QtCore import Qt,QRectF,QPointF
+from PyQt5.QtGui import QImage,QCursor,QIcon,QPixmap
+from PyQt5.QtCore import Qt,QRectF
 from PyQt5.QtWidgets import *
 
 import xlwt
 import matplotlib.pyplot as plt
 import numpy as np
-
+from src.Tab1 import Tab1
 
 ROIByManualLeftUp = []
 ROIByManualRightDown = []
-
-def showSpectrumInCurrentFigure():
-    p = Window.lab.point
-
-    gw = Window.graphicsView.width()
-    gh = Window.graphicsView.height()
-    sw = Window.graphicsView.scene().width()
-    sh = Window.graphicsView.scene().height()
-
-    _w = (gw-sw)/2
-    _h = (gh-sh)/2
-
-    if(p.x()- _w > 0 and p.x() - _w < sw and p.y()-_h> 0 and p.y()- _h<sh):
-        x = int(p.x() - _w)
-        y = int(p.y() - _h)
-
-        a = float(Window.w[0])
-        b = float(Window.w[-1])
-        c = int(Window.b)
-
-        Window.waveData.append(Window.image[y, :, x])
-
-        plt.close()
-        plt.figure("Spectral curve")
-        for i,j in enumerate(Window.waveData):
-            plt.plot(np.linspace(a,b,c),j)
-        plt.xticks(np.linspace(a,b,c/20))
-        plt.axvline(float(Window.w[Window.comboBox.currentIndex()]))
-        plt.plot(Window.w[Window.comboBox.currentIndex()],
-                 Window.image[y, :, x][Window.comboBox.currentIndex()],'o')
-        plt.show()
-
-    else:
-        msg_box = QMessageBox(QMessageBox.Warning, "Warning", "请选择有效区域!")
-        msg_box.exec_()
-
-def showSpectrum():
-    p = Window.lab.point
-
-    gw = Window.graphicsView.width()
-    gh = Window.graphicsView.height()
-    sw = Window.graphicsView.scene().width()
-    sh = Window.graphicsView.scene().height()
-
-    _w = (gw - sw) / 2
-    _h = (gh - sh) / 2
-
-    if (p.x() - _w > 0 and p.x() - _w < sw and p.y() - _h > 0 and p.y() - _h < sh):
-        x = int(p.x() - _w)
-        y = int(p.y() - _h)
-
-        a = float(Window.w[0])
-        b = float(Window.w[-1])
-        c = int(Window.b)
-        Window.waveData.clear()
-        Window.waveData.append(Window.image[y, :, x])
-
-        plt.close()
-        plt.figure("Spectral curve")
-        for i, j in enumerate(Window.waveData):
-            plt.plot(np.linspace(a, b, c), j)
-        plt.xticks(np.linspace(a, b, c / 20))
-        plt.axvline(float(Window.w[Window.comboBox.currentIndex()]))
-        plt.plot(Window.w[Window.comboBox.currentIndex()],
-                 Window.image[y, :, x][Window.comboBox.currentIndex()], 'o')
-        # plt.legend(["Spectral curve","Current spectral band"])
-        plt.show()
-
-    else:
-        msg_box = QMessageBox(QMessageBox.Warning, "Warning", "请选择有效区域!")
-        msg_box.exec_()
-
-def saveImage():
-    savePath = QFileDialog.getSaveFileName()
-    band = Window.comboBox.currentIndex()
-    img2D = np.uint8(Window.image[:,band,:] * 255)
-    height, width = img2D.shape
-    bytesPerComponent = 1
-    bytesPerLine = bytesPerComponent * width
-    Qimg = QImage(img2D, width, height, bytesPerLine, QImage.Format_Grayscale8)
-    Qimg.save(savePath[0])
-
-def saveSpectrumToCSV():
-    p1 = QCursor.pos()
-    p2 = Window.lab.mapToGlobal(Window.lab.pos())
-    p = p1 - p2
-
-    gw = Window.graphicsView.width()
-    gh = Window.graphicsView.height()
-    sw = Window.graphicsView.scene().width()
-    sh = Window.graphicsView.scene().height()
-
-    _w = (gw - sw) / 2
-    _h = (gh - sh) / 2
-
-    if (p.x() - _w > 0 and p.x() - _w < sw and p.y() - _h > 0 and p.y() - _h < sh):
-        x = int(p.x() - _w)
-        y = int(p.y() - _h)
-        a = float(Window.w[0])
-        b = float(Window.w[-1])
-        c = int(Window.b)
-        wave = Window.w
-        data = Window.image[y, :, x]
-
-        dataFrame = pd.DataFrame({'Wave':wave ,'Data':data})
-        fileName = Window.label.text()
-        fileName = fileName[5:] + '.csv'
-        dataFrame.to_csv(fileName, index=False ,sep=',')
-
-    else:
-        msg_box = QMessageBox(QMessageBox.Warning, "Warning", "请选择有效区域!")
-        msg_box.exec_()
-
-def saveSpectrumToExcel():
-    p1 = QCursor.pos()
-    p2 = Window.lab.mapToGlobal(Window.lab.pos())
-    p = p1 - p2
-
-    gw = Window.graphicsView.width()
-    gh = Window.graphicsView.height()
-    sw = Window.graphicsView.scene().width()
-    sh = Window.graphicsView.scene().height()
-
-    _w = (gw - sw) / 2
-    _h = (gh - sh) / 2
-
-    if (p.x() - _w > 0 and p.x() - _w < sw and p.y() - _h > 0 and p.y() - _h < sh):
-        x = int(p.x() - _w)
-        y = int(p.y() - _h)
-        a = float(Window.w[0])
-        b = float(Window.w[-1])
-        c = int(Window.b)
-        wave = Window.w
-        data = Window.image[y, :, x]
-
-        excelFile = xlwt.Workbook(encoding='utf-8')
-        booksheet = excelFile.add_sheet('Spectrum', cell_overwrite_ok=True)
-
-        booksheet.write(0, 0, "Wave")
-        for i, j in enumerate(wave):
-            booksheet.write(i + 1, 0, str(j))
-
-        booksheet.write(0, 1, 'Data')
-        for l, m in enumerate(data):
-            booksheet.write(l + 1, 1, str(m))
-        fileName = Window.label.text()
-        fileName = fileName[5:] + '.xls'
-        excelFile.save(fileName)
-
-    else:
-        msg_box = QMessageBox(QMessageBox.Warning, "Warning", "请选择有效区域!")
-        msg_box.exec_()
-
-class MenuLabel(QLabel):
-    def __init__(self, parent=None):
-        super(MenuLabel, self).__init__(parent)
-        self.createContextMenu()
-        self.point = None
-    def mousePressEvent(self, ev: QtGui.QMouseEvent):
-        self.point = ev.pos()
-    def createContextMenu(self):
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.showContextMenu)
-        self.contextMenu = QMenu(self)
-        self.action = self.contextMenu.addAction(QIcon('img/line.png'),u'显示光谱曲线')
-        self.action.triggered.connect(showSpectrum)
-        self.action1 = self.contextMenu.addAction(QIcon('img/line.png'), u'在现有图中显示光谱曲线')
-        self.action1.triggered.connect(showSpectrumInCurrentFigure)
-        self.action2 = self.contextMenu.addAction(QIcon('img/save.png'), u'保存图片')
-        self.action2.triggered.connect(saveImage)
-        self.action3 = self.contextMenu.addAction(QIcon('img/excel.png'), u'保存该点光谱至Excel')
-        self.action3.triggered.connect(saveSpectrumToExcel)
-        self.action4 = self.contextMenu.addAction(QIcon('img/CSV.png'), u'保存该点光谱至CSV')
-        self.action4.triggered.connect(saveSpectrumToCSV)
-
-
-    def showContextMenu(self):
-        self.contextMenu.exec_(QCursor.pos())
-
-
-# this is Tab2
-class MyGraphicsScene(QGraphicsScene):
-    def mousePressEvent(self, event):
-        self.pressPos = event.scenePos()
-
-        self.Rec = QRectF(self.pressPos,self.pressPos)
-        #
-        self.RecItem = QGraphicsRectItem(self.Rec)
-        self.RecItem.setVisible(True)
-        self.addItem(self.RecItem)
-        # self.addRect(self.Rec)
-    def mouseMoveEvent(self, event):
-
-        self.movePos = event.scenePos()
-        # self.removeItem(self.Rec)
-
-        # self.Rec.setBottomRight(self.movePos)
-
-        self.removeItem(self.RecItem)
-        self.RecItem.setRect(QRectF(self.pressPos,self.movePos))
-
-        self.addItem(self.RecItem)
-
-
-
-    def mouseReleaseEvent(self, event):
-
-        pass
-        # self.relessPos= event.scenePos()
-        # rec = QRectF(QPointF(self.pressPos), self.relessPos)
-        # pen = QPen()
-        # pen.setColor(QColor(255, 0, 0))
-        # bru = QBrush()
-        # self.addRect(rec, pen, bru)
-        # ROIByManualLeftUp.append(self.pressPos)
-        # ROIByManualRightDown.append(self.relessPos)
-
-
 
 class MyWindow(QMainWindow,Ui_Hyperspectral):
     def __init__(self,parent = None):
@@ -245,10 +26,11 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         self.setupUi(self)
         self.action_4.triggered.connect(self.about)
 
+        '''Tab1 Init'''
+        self.Tab1 = Tab1(MainWindow = self)
+
         ''' Tab2 Init '''
-        self.scene = MyGraphicsScene()
-
-
+        self.scene = self.MyGraphicsScene()
 
         self.lineEdit.setText("10")
         self.lineEdit_2.setText("70")
@@ -266,6 +48,51 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         self.comboBox_3.addItems(["圆形"])
         self.comboBox_3.addItems(["矩形"])
         self.statusbar.showMessage("西北农林科技大学   Powerby PyQt")
+
+    class MyGraphicsScene(QGraphicsScene):
+        def mousePressEvent(self, event):
+            self.pressPos = event.scenePos()
+            self.Rec = QRectF(self.pressPos, self.pressPos)
+            self.RecItem = QGraphicsRectItem(self.Rec)
+            self.RecItem.setVisible(True)
+            self.addItem(self.RecItem)
+
+        def mouseMoveEvent(self, event):
+            self.movePos = event.scenePos()
+            self.removeItem(self.RecItem)
+            self.RecItem.setRect(QRectF(self.pressPos, self.movePos))
+            self.addItem(self.RecItem)
+
+        def mouseReleaseEvent(self, event):
+            pass
+
+    class MenuLabel(QLabel):
+        def __init__(self,myWindow):
+            QLabel.__init__(self)
+            self.win = myWindow
+            self.createContextMenu()
+            self.point = None
+
+        def mousePressEvent(self, ev: QtGui.QMouseEvent):
+            self.point = ev.pos()
+
+        def createContextMenu(self):
+            self.setContextMenuPolicy(Qt.CustomContextMenu)
+            self.customContextMenuRequested.connect(self.showContextMenu)
+            self.contextMenu = QMenu(self)
+            self.action = self.contextMenu.addAction(QIcon('img/line.png'), u'显示光谱曲线')
+            self.action.triggered.connect(self.win.Tab1.showSpectrum)
+            self.action1 = self.contextMenu.addAction(QIcon('img/line.png'), u'在现有图中显示光谱曲线')
+            self.action1.triggered.connect(self.win.Tab1.showSpectrumInCurrentFigure)
+            self.action2 = self.contextMenu.addAction(QIcon('img/save.png'), u'保存图片')
+            self.action2.triggered.connect(self.win.Tab1.saveImage)
+            self.action3 = self.contextMenu.addAction(QIcon('img/excel.png'), u'保存该点光谱至Excel')
+            self.action3.triggered.connect(self.win.Tab1.saveSpectrumToExcel)
+            self.action4 = self.contextMenu.addAction(QIcon('img/CSV.png'), u'保存该点光谱至CSV')
+            self.action4.triggered.connect(self.win.Tab1.saveSpectrumToCSV)
+
+        def showContextMenu(self):
+            self.contextMenu.exec_(QCursor.pos())
 
     def ConventToQImage(self, band):
         temp = np.max(self.image) - np.min(self.image)
@@ -351,7 +178,7 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         self.lcdNumber.setDigitCount(8)
         self.lcdNumber.display(self.w[197])
 
-        self.lab = MenuLabel()
+        self.lab = self.MenuLabel(self)
         vbox = QVBoxLayout()
         vbox.setContentsMargins(0,0,0,0)
         vbox.addWidget(self.lab)
@@ -557,24 +384,24 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
 
 
             self.textEdit.clear()
-            accLDA,self.matLDA = Classifier.LDA(fileURL,iterNum,kflod)
+            accLDA,self.matLDA = Classifier.LDA(fileURL, iterNum, kflod)
 
             text = 'LDA,{0}折交叉验证,迭代{1}次,准确率为:{2}'.format(kflod,iterNum,accLDA)
             self.textEdit.append(text)
 
-            accSVM,self.matSVM = Classifier.SVM(fileURL,iterNum,kflod)
+            accSVM,self.matSVM = Classifier.SVM(fileURL, iterNum, kflod)
             text = 'SVM,{0}折交叉验证,迭代{1}次,准确率为:{2}'.format(kflod, iterNum, accSVM)
             self.textEdit.append(text)
 
-            accKNN,self.matKNN = Classifier.KNN(fileURL,iterNum,kflod)
+            accKNN,self.matKNN = Classifier.KNN(fileURL, iterNum, kflod)
             text = 'KNN,{0}折交叉验证,迭代{1}次,准确率为:{2}'.format(kflod, iterNum, accKNN)
             self.textEdit.append(text)
 
-            accDT,self.matDT = Classifier.DT(fileURL,iterNum,kflod)
+            accDT,self.matDT = Classifier.DT(fileURL, iterNum, kflod)
             text = 'DecisionTree,{0}折交叉验证,迭代{1}次,准确率为:{2}'.format(kflod, iterNum, accDT)
             self.textEdit.append(text)
 
-            accSDE,self.matSDE = Classifier.SDE(fileURL,kflod,numLearn,numWave)
+            accSDE,self.matSDE = Classifier.SDE(fileURL, kflod, numLearn, numWave)
             text = 'SDE,{0}折交叉验证,{1}个弱学习器,子空间维数为{2}时,准确率为:{3}'.format(kflod, numLearn,numWave,accSDE)
             self.textEdit.append(text)
 

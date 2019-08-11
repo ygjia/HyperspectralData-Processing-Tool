@@ -12,7 +12,6 @@ from sklearn.metrics import confusion_matrix
 
 
 def LDA(filePath,iterNum,nfold):
-
     variableName = "afterSGSmooth"
     mat = sio.loadmat(filePath)
     data = mat[variableName]
