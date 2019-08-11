@@ -34,7 +34,7 @@ The code written at the time was very messy. Recently, I will try to make the co
 The source code was already tested on Windows 10, Ubuntu 18.04 and deepin 15.10.
 
 ```bash
-python Main.py
+python main.py
 ```
 
 ## Citation
