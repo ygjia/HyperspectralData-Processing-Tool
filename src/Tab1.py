@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import xlwt
+import xlwt,os,re
 from PyQt5.QtWidgets import QMessageBox,QFileDialog
-from PyQt5.QtGui import QImage,QCursor,QIcon,QPixmap
+from PyQt5.QtGui import QImage,QCursor
 import pandas as pd
-# from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QVBoxLayout
+from src.ShowData import *
+
 
 class Tab1(object):
     def __init__(self,MainWindow):
@@ -232,3 +234,39 @@ class Tab1(object):
         else:
             msg_box = QMessageBox(QMessageBox.Warning, "Warning", "请选择有效区域!")
             msg_box.exec_()
+
+    def OnClickedTab1Button(self):
+        filePath = QFileDialog.getOpenFileName(self.window, 'Open file', os.getcwd())
+
+        if(not filePath[0]):
+            return
+
+        filename = re.search("\/+([^\/]*$)", filePath[0]).group(1)
+        self.window.waveData = []
+        self.window.w,self.window.l,self.window.s,self.window.b,self.window.dt= readInfo(filePath[0]+".hdr")
+        self.window.image = showData(filePath[0])
+
+        if filePath:
+            scene = self.window.ConventToQImage(197)
+            self.window.graphicsView.setScene(scene)
+
+        self.window.comboBox.addItems(self.window.w)
+        self.window.label.setText("文件名称: "+filename)
+        self.window.label_2.setText("Lines: " + str(self.window.l))
+        self.window.label_3.setText("Samples:  " + str(self.window.s))
+        self.window.label_4.setText("Bands: " + str(self.window.b))
+        self.window.label_6.setText("波段范围: " + self.window.w[0]+"~"+self.window.w[-1])
+        self.window.lcdNumber.setDigitCount(8)
+        self.window.lcdNumber.display(self.window.w[197])
+
+        self.window.lab = self.window.MenuLabel(self.window)
+        vbox = QVBoxLayout()
+        vbox.setContentsMargins(0,0,0,0)
+        vbox.addWidget(self.window.lab)
+
+        self.window.graphicsView.setLayout(vbox)
+    def ShowBond(self):
+        band = self.window.comboBox.currentIndex()
+        scene = self.window.ConventToQImage(band)
+        self.window.graphicsView.setScene(scene)
+        self.window.lcdNumber.display(self.window.w[band])

@@ -5,20 +5,17 @@ from scipy.signal import savgol_filter
 from src import Classifier
 
 import sys
-import os,re
+import os
 import pandas as pd
 
 from PyQt5.QtGui import QImage,QCursor,QIcon,QPixmap
 from PyQt5.QtCore import Qt,QRectF
 from PyQt5.QtWidgets import *
 
-import xlwt
 import matplotlib.pyplot as plt
 import numpy as np
 from src.Tab1 import Tab1
-
-ROIByManualLeftUp = []
-ROIByManualRightDown = []
+from src.Tab2 import Tab2
 
 class MyWindow(QMainWindow,Ui_Hyperspectral):
     def __init__(self,parent = None):
@@ -30,6 +27,8 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         self.Tab1 = Tab1(MainWindow = self)
 
         ''' Tab2 Init '''
+        self.Tab2 = Tab2(MainWindow = self)
+
         self.scene = self.MyGraphicsScene()
 
         self.lineEdit.setText("10")
@@ -94,246 +93,36 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         def showContextMenu(self):
             self.contextMenu.exec_(QCursor.pos())
 
-    def ConventToQImage(self, band):
-        temp = np.max(self.image) - np.min(self.image)
-        img2D = np.uint8((self.image[:,band,:]/temp)*255)
-        height, width = img2D.shape
-        bytesPerComponent = 1
-        bytesPerLine = bytesPerComponent * width
-        Qimg = QImage(img2D, width, height, bytesPerLine, QImage.Format_Grayscale8)
-
-        scene = QGraphicsScene()
-        scene.addPixmap(QPixmap(Qimg))
-
-        return scene
-
-    def ConventToQImageWithHough(self, band):
-        temp = np.max(self.image) - np.min(self.image)
-        img2D = np.uint8((self.image[:,band,:]/temp)*255)
-
-        if(self.lineEdit_2.text().__len__() is 0):
-            maxR = 70
-        else:
-            maxR = int(self.lineEdit_2.text())
-
-        if (self.lineEdit.text().__len__() is 0):
-            minR = 10
-        else:
-            minR = int(self.lineEdit.text())
-
-        if(self.comboBox_3.currentText() == "圆形"):
-            circle = cv2.HoughCircles(img2D, cv2.HOUGH_GRADIENT, 1,
-                                      30, param1=100, param2=25, minRadius=minR, maxRadius=maxR)
-            if(not circle is None):
-                circles = circle[0, :, :];
-                circles = np.uint16(np.around(circles))
-                for i in circles[:]:
-                    cv2.circle(img2D, (i[0], i[1]), i[2], (255, 0, 0), 2)
-                    cv2.circle(img2D, (i[0], i[1]), 2, (255, 0, 0), 4)
-        else:
-            circle = cv2.HoughCircles(img2D, cv2.HOUGH_GRADIENT, 1,
-                                      30, param1=100, param2=25, minRadius=minR, maxRadius=maxR)
-            if (not circle is None):
-                circles = circle[0, :, :];
-                circles = np.uint16(np.around(circles))
-                for i in circles[:]:
-                    cv2.rectangle(img2D,(i[0]-i[2],i[1]-i[2]),(i[0]+i[2],i[1]+i[2]),(255,0,0),2)
-
-        height, width = img2D.shape
-        bytesPerComponent = 1
-        bytesPerLine = bytesPerComponent * width
-        Qimg = QImage(img2D, width, height, bytesPerLine, QImage.Format_Grayscale8)
-
-
-        self.scene.addPixmap(QPixmap(Qimg))
-        return self.scene
+    # def ConventToQImage(self, band):
+    #     return self.Tab2.ConventToQImage()
+    #
+    # def ConventToQImageWithHough(self, band):
+    #     return self.Tab2.ConventToQImageWithHough(band=band)
 
     def ShowBond(self):
-        band = self.comboBox.currentIndex()
-        scene = self.ConventToQImage(band)
-        self.graphicsView.setScene(scene)
-        self.lcdNumber.display(self.w[band])
+        self.Tab1.ShowBond()
 
     def OnClickedTab1Button(self):
-        filePath = QFileDialog.getOpenFileName(self, 'Open file', os.getcwd())
-
-        if(not filePath[0]):
-            return
-
-        filename = re.search("\/+([^\/]*$)", filePath[0]).group(1)
-        self.waveData = []
-        self.w,self.l,self.s,self.b,self.dt= readInfo(filePath[0]+".hdr")
-        self.image = showData(filePath[0])
-
-        if filePath:
-            scene = self.ConventToQImage(197)
-            self.graphicsView.setScene(scene)
-
-        self.comboBox.addItems(self.w)
-        self.label.setText("文件名称: "+filename)
-        self.label_2.setText("Lines: " + str(self.l))
-        self.label_3.setText("Samples:  " + str(self.s))
-        self.label_4.setText("Bands: " + str(self.b))
-        self.label_6.setText("波段范围: " + self.w[0]+"~"+self.w[-1])
-        self.lcdNumber.setDigitCount(8)
-        self.lcdNumber.display(self.w[197])
-
-        self.lab = self.MenuLabel(self)
-        vbox = QVBoxLayout()
-        vbox.setContentsMargins(0,0,0,0)
-        vbox.addWidget(self.lab)
-
-        self.graphicsView.setLayout(vbox)
+        self.Tab1.OnClickedTab1Button()
 
     def OnCilickedTab2Butto1(self):
-        self.dirPath = QFileDialog.getExistingDirectory()
-        if(self.dirPath):
-            rawFiles = [i for i in os.listdir(self.dirPath) if os.path.splitext(i)[1] == ".raw"]
-            bilFiles = [i for i in os.listdir(self.dirPath) if os.path.splitext(i)[1] == ".bil"]
-
-            if(rawFiles):
-                self.listWidget.addItems(rawFiles)
-
-            if (bilFiles):
-                pass
+        self.Tab2.OnCilickedTab2Butto1()
 
     def OnChangedTab2listWidget(self):
-        fileName = self.listWidget.currentItem().text()
-        fileUrl = self.dirPath+"/"+fileName
-        hdrFileName = fileUrl[:-4]+".hdr"
-        self.w, self.l, self.s, self.b,self.dt = readInfo(hdrFileName)
-        self.image = showData(fileUrl)
-        if fileUrl:
-            scene = self.ConventToQImageWithHough(197)
-            self.graphicsView_2.setScene(scene)
-        self.comboBox_2.clear()
-        self.comboBox_2.addItems(self.w)
+        self.Tab2.OnChangedTab2listWidget()
 
     def OnChangedTab2ComboBox1(self):
-        band = self.comboBox_2.currentIndex()
-        scene = self.ConventToQImageWithHough(band)
-        self.graphicsView_2.setScene(scene)
+        self.Tab2.OnChangedTab2ComboBox1()
+
 
     def OnCilickedTab2Butto2(self):
-        print(ROIByManualLeftUp)
-        print(ROIByManualRightDown)
+        self.Tab2.OnCilickedTab2Butto2()
 
     def OnCilickedTab2Butto3(self):
-        if(not hasattr(self,'w')):
-            return
-
-        band = self.w.index(self.comboBox_2.currentText())
-
-        temp = np.max(self.image) - np.min(self.image)
-        img2D = np.uint8((self.image[:, band, :] / temp) * 255)
-
-        if (self.lineEdit_2.text().__len__() is 0):
-            maxR = 70
-        else:
-            maxR = int(self.lineEdit_2.text())
-
-        if (self.lineEdit.text().__len__() is 0):
-            minR = 10
-        else:
-            minR = int(self.lineEdit.text())
-
-        if (self.comboBox_3.currentText() == "矩形"):
-            circle = cv2.HoughCircles(img2D, cv2.HOUGH_GRADIENT, 1,
-                                      30, param1=100, param2=25, minRadius=minR, maxRadius=maxR)
-            if (not circle is None):
-                circles = circle[0, :, :];
-                circles = np.uint16(np.around(circles))
-                excelFile = xlwt.Workbook(encoding='utf-8')
-                booksheet = excelFile.add_sheet('Spectrum', cell_overwrite_ok=True)
-                for a,b in enumerate(circles[:]):
-                    data = self.image[b[1]-b[2]:b[1]+b[2],:,b[0]-b[2]:b[0]+b[2]]
-                    data = np.average(data,axis=0)
-                    data = np.average(data,axis=1)
-                    for k, j in enumerate(data):
-                        booksheet.write(k,a,str(j))
-                fileName = self.listWidget.currentItem().text()
-                fileName = 'Rectangle_' + fileName + '.xls'
-                excelFile.save(fileName)
-        else:
-            circle = cv2.HoughCircles(img2D, cv2.HOUGH_GRADIENT, 1,
-                                      30, param1=100, param2=25, minRadius=minR, maxRadius=maxR)
-            if (not circle is None):
-                circles = circle[0, :, :];
-                circles = np.uint16(np.around(circles))
-                excelFile = xlwt.Workbook(encoding='utf-8')
-                booksheet = excelFile.add_sheet('Spectrum', cell_overwrite_ok=True)
-                for a, b in enumerate(circles[:]):
-                    data = self.image[b[1],:,b[0]]
-                    for i in np.arange(-1*b[2],b[2],1):
-                        for j in np.arange(-1*b[2],b[2],1):
-                            if(i**2 + j**2 < b[2]**2 and i**2 + j**2 != 0):
-                                data = np.c_[data,self.image[b[1]+i,:,b[0]+j]]
-                    data = np.average(data, axis=1)
-                    for k, j in enumerate(data):
-                        booksheet.write(k, a, str(j))
-                fileName = self.listWidget.currentItem().text()
-                fileName = 'Circle_'+fileName + '.xls'
-                excelFile.save(fileName)
+        self.Tab2.OnCilickedTab2Butto3()
 
     def OnCilickedTab2Butto4(self):
-        if (not hasattr(self, 'w')):
-            return
-
-        band = self.w.index(self.comboBox_2.currentText())
-        temp = np.max(self.image) - np.min(self.image)
-        img2D = np.uint8((self.image[:, band, :] / temp) * 255)
-
-        if (self.comboBox_3.currentText() == "矩形"):
-                excelFile = xlwt.Workbook(encoding='utf-8')
-                booksheet = excelFile.add_sheet('Spectrum', cell_overwrite_ok=True)
-                Len = len(ROIByManualLeftUp)
-                for i in np.arange(0,Len,1):
-                    sx = int(ROIByManualLeftUp[i].x())
-                    sy = int(ROIByManualLeftUp[i].y())
-                    ex = int(ROIByManualRightDown[i].x())
-                    ey = int(ROIByManualRightDown[i].y())
-
-                    data = self.image[sy:ey,:,sx:ex]
-                    data = np.average(data, axis=0)
-                    data = np.average(data, axis=1)
-                    plt.plot(data)
-
-                    for k, j in enumerate(data):
-                        booksheet.write(k, i, str(j))
-                fileName = self.listWidget.currentItem().text()
-                fileName = 'Rectangle_' + fileName + '.xls'
-                excelFile.save(fileName)
-                plt.show()
-        else:
-
-                excelFile = xlwt.Workbook(encoding='utf-8')
-                booksheet = excelFile.add_sheet('Spectrum', cell_overwrite_ok=True)
-                Len = len(ROIByManualLeftUp)
-                for i in np.arange(0, Len, 1):
-                    sx = int(ROIByManualLeftUp[i].x())
-                    sy = int(ROIByManualLeftUp[i].y())
-                    ex = int(ROIByManualRightDown[i].x())
-                    ey = int(ROIByManualRightDown[i].y())
-                    m=min(ex-sx,ey-sy)
-                    cx = int((sx+ex)/2)
-                    cy = int((sy+ey)/2)
-                    data = self.image[cy, :,cx]
-                    for i in np.arange(-1 * m, m, 1):
-                        for j in np.arange(-1 * m, m, 1):
-                            if (i ** 2 + j ** 2 < m ** 2 and i ** 2 + j ** 2 != 0):
-                                data = np.c_[data, self.image[cy + i, :, cx + j]]
-                    data = np.average(data, axis=1)
-                    plt.plot(data)
-                    for k, j in enumerate(data):
-                        booksheet.write(k, i, str(j))
-
-                fileName = self.listWidget.currentItem().text()
-                fileName = 'Circle_' + fileName + '.xls'
-                excelFile.save(fileName)
-
-                plt.show()
-        ROIByManualLeftUp.clear()
-        ROIByManualRightDown.clear()
+        self.Tab2.OnCilickedTab2Butto4()
 
     def ReadDirTab4(self):
         self.Tab4DirPath = QFileDialog.getExistingDirectory()
@@ -499,7 +288,6 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
                               "<p align='center'>基于高光谱图像的苹果表面农残检测研究成果</p>"
                               "<p align='right'> 西北农林科技大学信息工程学院</p>"
                               "<p align='right'> 贾亚光,邵夏天</p>"
-
                               )
         msg_box.exec_()
 
