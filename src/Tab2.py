@@ -168,7 +168,7 @@ class Tab2(object):
         bytesPerLine = bytesPerComponent * width
         Qimg = QImage(img2D, width, height, bytesPerLine, QImage.Format_Grayscale8)
 
-        scene = self.window.QGraphicsScene()
+        scene = self.window.MyGraphicsScene()
         scene.addPixmap(QPixmap(Qimg))
 
         return scene

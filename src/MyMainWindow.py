@@ -93,11 +93,11 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
         def showContextMenu(self):
             self.contextMenu.exec_(QCursor.pos())
 
-    # def ConventToQImage(self, band):
-    #     return self.Tab2.ConventToQImage()
-    #
-    # def ConventToQImageWithHough(self, band):
-    #     return self.Tab2.ConventToQImageWithHough(band=band)
+    def ConventToQImage(self, band):
+        return self.Tab2.ConventToQImage(band)
+
+    def ConventToQImageWithHough(self, band):
+        return self.Tab2.ConventToQImageWithHough(band=band)
 
     def ShowBond(self):
         self.Tab1.ShowBond()
@@ -113,7 +113,6 @@ class MyWindow(QMainWindow,Ui_Hyperspectral):
 
     def OnChangedTab2ComboBox1(self):
         self.Tab2.OnChangedTab2ComboBox1()
-
 
     def OnCilickedTab2Butto2(self):
         self.Tab2.OnCilickedTab2Butto2()
