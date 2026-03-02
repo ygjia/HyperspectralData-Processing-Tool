@@ -1,0 +1,28 @@
+[project]
+name = "hyperspectral-data-processing-tool"
+version = "1.0.0"
+description = "A simple software for processing hyperspectral data"
+readme = "README.md"
+requires-python = ">=3.8,<3.12"
+license = { text = "GPL-3.0" }
+authors = [
+    { name = "Yaguang Jia" },
+]
+
+dependencies = [
+    "PyQt5>=5.15,<6",
+    "numpy>=1.21,<2",
+    "pandas>=1.3,<3",
+    "opencv-python>=4.5,<5",
+    "matplotlib>=3.4,<4",
+    "scipy>=1.7,<2",
+    "scikit-learn>=1.0,<2",
+    "xlwt>=1.3,<2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
